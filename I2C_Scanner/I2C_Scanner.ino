@@ -58,13 +58,28 @@
 //   70: -- -- -- -- -- -- -- --
 //
 //----------------------------------------------------------------------------
+//
+//
+// Version 7, May 15, 2015
+//    by Boen
+//    Works with Arduino IDE 1.7.3 and Arduino Zero Pro
+//
+//    With MODE_WRITE_BYTE it will write one byte to 
+//    all addresses. This might cause problems.
+
+// When using an Arduino Zero Pro
+#ifdef __SAMD21G18A__
+// #define Serial SERIAL_PORT_USBVIRTUAL       // Arduino Zero Pro Naitive USB Port
+#define Serial Serial5                         // Arduino Zero Pro Programming Port 
+#endif
 
 #include <Wire.h>
 
-#define VERSION           "6.0"
+#define VERSION           "7.0"
 
 #define MODE_WRITE_QUICK   true // Takes precedence over read-byte mode
-#define MODE_READ_BYTE    false
+#define MODE_WRITE_BYTE    true
+#define MODE_READ_BYTE     false
 #define SERIAL_BAUD_RATE   9600
 #define REPEAT_DELAY       5000 // milliseconds
 
@@ -80,6 +95,7 @@
 #define READ_HINT_RANGE_2_END    0x5f
 
 uint8_t deviceStatus[128]; // global
+byte data = 0;
 
 void setup()
 {
@@ -107,6 +123,9 @@ void loop()
   {
     // Address the device
     Wire.beginTransmission(addr);
+    if (MODE_WRITE_BYTE){
+      Wire.write(data);
+    }
     
     // Read-byte mode: Request one byte from the device
     if (!MODE_WRITE_QUICK) {
